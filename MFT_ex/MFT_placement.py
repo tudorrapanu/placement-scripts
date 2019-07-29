@@ -2,11 +2,15 @@ import sys
 import csv
 import re
 
-with open(sys.argv[1]) as csvfile:
+with open(sys.argv[1],'r') as csvfile:
 	readCSV = csv.reader(csvfile, delimiter=',')
 	list_rows = list()
 	for row in readCSV:
 		list_rows.append(row)
+
+
+	if list_rows[0][0] != 'portal_email':
+		quit()
 
 	domain = (re.search("@[\w.]+", list_rows[1][0])).group()
 	domain = domain[1:-4]
@@ -15,7 +19,6 @@ with open(sys.argv[1]) as csvfile:
 	if domain == 'pinnacleag':
 		print('AVAILABLE CLIENT IDs:')
 		
-
 	elif domain == 'teasdalefoods':
 		print('AVAILABLE CLIENT IDs:')
 		print("TEAS01	TEASDALE LATIN FOODS	RICK PIKE")
@@ -84,4 +87,39 @@ with open(sys.argv[1]) as csvfile:
 		print("LOLI39	LAND O LAKES, INC - PURINA		SUE COYLE-AVARITT")
 		print("LOLI40	LAND O LAKES - WINFIELD			SUE COYLE-AVARITT")
 
-	client_id = str(raw_input("\nThe client ID will be: "))
+	if domain != 'rexelusa':
+		client_id = str(raw_input("\nThe client ID will be: "))
+	else:
+		state1 = list_rows[1][10]
+		if state1 in ['MD', 'OH', 'NC', 'VA', 'PA', 'NY']:
+			client_id = 'REXL01'
+		elif state1 in ['AL', 'GA', 'MO', 'KY', 'IL', 'TN', 'FL', 'FY', 'LA', 'MS']:
+			client_id = 'REXL02'
+		elif state1 in ['AR', 'CT', 'OR', 'AZ', 'LA', 'TX', 'MA', 'CA', 'ME', 'WA', 'NH', 'CT', 'CO' , 'OK', 'Capitol Light']:
+			client_id = 'REXL03'
+
+	agency_id = 'USD3'
+	country1 = 'USA'
+
+with open(sys.argv[1],'w') as csvfile:
+	if list_rows[1][14] == '' and list_rows[0][14] == 'inv_num':
+		list_rows[0][14] = ''
+		list_rows[0][15] = ''
+		list_rows[0][14:] = list_rows[0][16:]
+		list_rows[1][14:] = list_rows[1][16:]
+
+	list_rows[0][-1] = 'email1'
+
+	list_rows[1][3] = client_id
+	list_rows[1][4] = agency_id
+	list_rows[1][12] = country1
+
+	if list_rows[0][0] == 'portal_email':
+		list_rows[0][0:] = list_rows[0][3:]
+		list_rows[1][0:] = list_rows[1][3:]
+
+	writeCSV = csv.writer(csvfile)
+	writeCSV.writerow(list_rows[0])
+	writeCSV.writerow(list_rows[1])
+
+	print("/// THE FILE WAS WRITTEN SUCCESSFULLY ///")
